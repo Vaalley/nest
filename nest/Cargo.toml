@@ -35,6 +35,12 @@ uuid = { workspace = true }
 tracing = { workspace = true }
 tracing-subscriber = { version = "0.3", features = ["env-filter"] }
 
+argon2 = "0.5"
+base64 = "0.22"
+hmac = "0.12"
+rand = "0.8"
+sha2 = "0.10"
+
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tower = { version = "0.5", features = ["util"] }

@@ -31,7 +31,7 @@ every later phase builds on stable ground.
 - [x] Add `rustfmt.toml` and `clippy.toml`; agree on lint policy (`-D warnings` in CI).
 - [x] Set up pre-commit hooks (`.pre-commit-config.yaml` or a Husky-style hook) running `cargo fmt --check` + `cargo clippy`. _(`.pre-commit-config.yaml` local hooks.)_
 - [x] GitHub Actions CI: matrix build (Linux + Windows), `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test`. _(`.github/workflows/ci.yml`.)_
-- [~] Choose and document core dependencies (web framework e.g. `axum`, `sqlx` or `rusqlite`, `serde`, `tokio`, `tracing`, `argon2`, `jsonwebtoken`, `zip`, `blake3`/`sha2`). _(Phase 1 set: `axum`, `sqlx`+`sqlite`, `serde`, `tokio`, `tracing`, `thiserror`, `time`, `uuid`. Auth/packaging crates land in later phases.)_
+- [x] Choose and document core dependencies (web framework e.g. `axum`, `sqlx` or `rusqlite`, `serde`, `tokio`, `tracing`, `argon2`, `jsonwebtoken`, `zip`, `blake3`/`sha2`). _(`axum`, `sqlx`+`sqlite`, `serde`, `tokio`, `tracing`, `thiserror`, `time`, `uuid`, `argon2`, `hmac`, `sha2`, `base64`, `rand`.)_
 - [x] Root `README` updates: dev setup, build, run instructions per crate. _(Development section in `README.md` + `.env.example`.)_
 
 **Exit criteria:** `cargo build`, `cargo fmt --check`, `cargo clippy`, and `cargo test` all pass locally and in CI on Linux + Windows. _(All pass locally on Windows; CI workflow added to run the matrix on Linux + Windows.)_
@@ -65,14 +65,14 @@ config, logging, and health check.
 
 **Goal:** Secure single-user account registration and login with token issuance.
 
-- [ ] `POST /api/flock/register` — validate username, hash password with Argon2, persist Flock.
-- [ ] `POST /api/flock/login` — verify credentials, issue a signed token (JWT or opaque token in DB).
-- [ ] Auth middleware/extractor that validates the token and injects the current Flock into request context.
-- [ ] Reject duplicate usernames; rate-limit or throttle login attempts (basic).
-- [ ] Input validation + uniform auth error responses (no user-enumeration leaks).
-- [ ] Unit tests for hashing/verification; integration tests for register → login → authenticated request.
+- [x] `POST /api/flock/register` — validate username, hash password with Argon2, persist Flock.
+- [x] `POST /api/flock/login` — verify credentials, issue a signed HMAC-SHA256 token (compact JWT-like format).
+- [x] Auth middleware/extractor that validates the token and injects the current Flock into request context.
+- [x] Reject duplicate usernames; rate-limit or throttle login attempts (basic per-IP sliding window, 5 req/min).
+- [x] Input validation + uniform auth error responses (no user-enumeration leaks on login).
+- [x] Tests for hashing/verification; integration tests for register → login → authenticated request.
 
-**Exit criteria:** A new account can register, log in, receive a token, and use it to access a protected route; invalid credentials are rejected.
+**Exit criteria:** A new account can register, log in, receive a token, and use it to access a protected route; invalid credentials are rejected. _(Done.)_
 
 ---
 
@@ -80,13 +80,13 @@ config, logging, and health check.
 
 **Goal:** Registration and listing of client devices belonging to a Flock.
 
-- [ ] `POST /api/birds/register` — link a device (name, platform); associate with authenticated Flock; return Bird id/credentials.
-- [ ] `GET /api/birds` — list the Flock's registered devices with `last_seen` status.
-- [ ] Update `last_seen` on authenticated device activity.
-- [ ] Scope all Bird queries to the owning Flock (authorization checks).
-- [ ] Integration tests: register two Birds, list them, ensure cross-Flock isolation.
+- [x] `POST /api/birds/register` — link a device (name, platform); associate with authenticated Flock; return Bird id/credentials (signed device token).
+- [x] `GET /api/birds` — list the Flock's registered devices with `last_seen` status.
+- [x] Update `last_seen` on authenticated device activity (set at registration, refreshed by the auth extractor).
+- [x] Scope all Bird queries to the owning Flock (authorization checks via token claims).
+- [x] Integration tests: register two Birds, list them, ensure cross-Flock isolation.
 
-**Exit criteria:** A logged-in Flock can register and enumerate its Birds; Birds from other Flocks are never visible.
+**Exit criteria:** A logged-in Flock can register and enumerate its Birds; Birds from other Flocks are never visible. _(Done.)_
 
 ---
 

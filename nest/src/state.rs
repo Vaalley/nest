@@ -5,6 +5,7 @@ use std::sync::Arc;
 use sqlx::SqlitePool;
 
 use crate::config::Config;
+use crate::rate_limit::{RateLimiter, DEFAULT_MAX_REQUESTS, DEFAULT_WINDOW};
 use crate::repository::{BirdRepository, ClutchRepository, EggRepository, FlockRepository};
 
 /// Cloneable application state (cheap: everything behind `Arc`/pool handle).
@@ -16,6 +17,7 @@ pub struct AppState {
 struct Inner {
     config: Config,
     pool: SqlitePool,
+    rate_limiter: RateLimiter,
     flocks: FlockRepository,
     birds: BirdRepository,
     clutches: ClutchRepository,
@@ -24,6 +26,7 @@ struct Inner {
 
 impl AppState {
     pub fn new(config: Config, pool: SqlitePool) -> Self {
+        let rate_limiter = RateLimiter::new(DEFAULT_WINDOW, DEFAULT_MAX_REQUESTS);
         let flocks = FlockRepository::new(pool.clone());
         let birds = BirdRepository::new(pool.clone());
         let clutches = ClutchRepository::new(pool.clone());
@@ -33,6 +36,7 @@ impl AppState {
             inner: Arc::new(Inner {
                 config,
                 pool,
+                rate_limiter,
                 flocks,
                 birds,
                 clutches,
@@ -47,6 +51,10 @@ impl AppState {
 
     pub fn pool(&self) -> &SqlitePool {
         &self.inner.pool
+    }
+
+    pub fn rate_limiter(&self) -> &RateLimiter {
+        &self.inner.rate_limiter
     }
 
     pub fn flocks(&self) -> &FlockRepository {

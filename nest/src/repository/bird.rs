@@ -48,8 +48,8 @@ impl BirdRepository {
     pub async fn create(&self, flock_id: Uuid, name: &str, platform: Platform) -> AppResult<Bird> {
         let id = Uuid::new_v4();
         let row = sqlx::query_as::<_, BirdRow>(
-            "INSERT INTO birds (id, flock_id, name, platform) \
-             VALUES (?1, ?2, ?3, ?4) \
+            "INSERT INTO birds (id, flock_id, name, platform, last_seen) \
+             VALUES (?1, ?2, ?3, ?4, unixepoch()) \
              RETURNING id, flock_id, name, platform, last_seen, created_at",
         )
         .bind(id.to_string())

@@ -45,7 +45,7 @@ pub struct Config {
 impl Config {
     /// Load configuration from the process environment, applying defaults.
     pub fn from_env() -> AppResult<Self> {
-        let bind_addr = env_or(env_keys::BIND_ADDR, "127.0.0.1:8080")
+        let bind_addr = env_or(env_keys::BIND_ADDR, "127.0.0.1:8140")
             .parse::<SocketAddr>()
             .map_err(|e| AppError::Config(format!("invalid {}: {e}", env_keys::BIND_ADDR)))?;
 

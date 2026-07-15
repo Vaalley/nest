@@ -1,0 +1,38 @@
+[package]
+name = "nest-bird"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "The Bird — a Tauri desktop client for the Nest save-backup platform."
+
+[lib]
+name = "nest_bird_lib"
+path = "src/lib.rs"
+
+[[bin]]
+name = "nest-bird"
+path = "src/main.rs"
+
+[build-dependencies]
+tauri-build = { version = "2.0", features = [] }
+
+[dependencies]
+nest-shared = { path = "../../shared" }
+
+tauri = { version = "2.0", features = ["tray-icon"] }
+
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs"] }
+reqwest = { version = "0.12", features = ["json", "multipart"] }
+
+serde = { workspace = true }
+serde_json = { workspace = true }
+thiserror = { workspace = true }
+time = { workspace = true }
+uuid = { workspace = true }
+tracing = { workspace = true }
+
+sha2 = "0.10"
+walkdir = "2"
+dirs = "5"
+keyring = { version = "3", default-features = false, features = ["windows-native", "sync-secret-service"] }

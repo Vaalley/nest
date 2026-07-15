@@ -4,37 +4,19 @@ use std::net::SocketAddr;
 
 use axum::extract::{ConnectInfo, State};
 use axum::Json;
-use serde::{Deserialize, Serialize};
 
+use nest_shared::api::{AuthResponse, LoginRequest, RegisterFlockRequest};
 use nest_shared::domain::Flock;
 
 use crate::auth::{create_token, hash_password, verify_password, AuthContext};
 use crate::error::{AppError, AppResult};
 use crate::state::AppState;
 
-#[derive(Debug, Deserialize)]
-pub struct RegisterRequest {
-    username: String,
-    password: String,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct LoginRequest {
-    username: String,
-    password: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct AuthResponse {
-    token: String,
-    flock: Flock,
-}
-
 /// `POST /api/flock/register` — create a new Flock account.
 pub async fn register(
     State(state): State<AppState>,
     connect_info: Option<ConnectInfo<SocketAddr>>,
-    Json(req): Json<RegisterRequest>,
+    Json(req): Json<RegisterFlockRequest>,
 ) -> AppResult<Json<AuthResponse>> {
     if let Some(ConnectInfo(addr)) = connect_info {
         state.rate_limiter().check(addr.ip())?;

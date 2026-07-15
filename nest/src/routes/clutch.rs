@@ -8,7 +8,6 @@ use axum::extract::{Multipart, Path, State};
 use axum::http::{header, StatusCode};
 use axum::response::{IntoResponse, Response};
 use axum::Json;
-use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use time::OffsetDateTime;
 use tokio::fs;
@@ -16,7 +15,11 @@ use tokio::io::AsyncWriteExt;
 use tokio_util::io::ReaderStream;
 use uuid::Uuid;
 
-use nest_shared::domain::{Clutch, Egg, SyncStatus};
+use nest_shared::api::{
+    ClutchSummary, CompareOutcome, CompareRequest, CompareResponse, Resolution, ResolveRequest,
+    ResolveResponse,
+};
+use nest_shared::domain::{Egg, SyncStatus};
 
 use crate::auth::AuthContext;
 use crate::error::{AppError, AppResult};
@@ -97,75 +100,8 @@ fn map_multipart_err(e: axum::extract::multipart::MultipartError) -> AppError {
 }
 
 // ---------------------------------------------------------------------------
-// DTOs
+// DTOs live in `nest-shared::api` so the Bird client uses the same contracts.
 // ---------------------------------------------------------------------------
-
-#[derive(Debug, Serialize)]
-pub struct ClutchSummary {
-    #[serde(flatten)]
-    clutch: Clutch,
-    status: SyncStatus,
-    egg_count: i64,
-    latest_egg: Option<Egg>,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct CompareRequest {
-    local_hash: String,
-    local_modified_at: i64,
-    bird_id: Option<Uuid>,
-}
-
-#[derive(Debug, Serialize)]
-#[serde(rename_all = "snake_case")]
-pub enum CompareOutcome {
-    /// Local save matches the latest Egg in the Nest.
-    Identical,
-    /// The Nest has a newer Egg; the Bird should pull it.
-    Pull,
-    /// The Bird's local save is newer; it should push after the play session.
-    Push,
-    /// Both sides have diverged since the last common ancestor.
-    Conflict,
-    /// This Clutch has no Eggs yet.
-    NoEggs,
-}
-
-#[derive(Debug, Serialize)]
-pub struct CompareResponse {
-    outcome: CompareOutcome,
-    status: SyncStatus,
-    clutch_id: Uuid,
-    latest_egg: Option<Egg>,
-    last_synced_egg: Option<Egg>,
-}
-
-#[derive(Debug, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum Resolution {
-    /// Keep the Nest's Egg.
-    Nest,
-    /// Keep the Bird's local save.
-    Local,
-}
-
-#[derive(Debug, Deserialize)]
-pub struct ResolveRequest {
-    resolution: Resolution,
-    /// Required when `resolution` is `local`.
-    local_hash: Option<String>,
-    /// Required when `resolution` is `local`.
-    local_modified_at: Option<i64>,
-    /// Optional specific Egg to keep when `resolution` is `nest` (defaults to latest).
-    egg_id: Option<Uuid>,
-    bird_id: Option<Uuid>,
-}
-
-#[derive(Debug, Serialize)]
-pub struct ResolveResponse {
-    status: SyncStatus,
-    baseline_egg: Option<Egg>,
-}
 
 // ---------------------------------------------------------------------------
 // Helpers

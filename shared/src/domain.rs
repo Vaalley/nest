@@ -15,7 +15,7 @@ use uuid::Uuid;
 pub const DEFAULT_BROOD_LIMIT: i64 = 10;
 
 /// The operating system / device class a Bird runs on.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Platform {
     Windows,

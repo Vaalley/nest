@@ -8,6 +8,7 @@ pub mod bird;
 pub mod clutch;
 pub mod egg;
 pub mod flock;
+pub mod sync;
 
 use time::OffsetDateTime;
 use uuid::Uuid;
@@ -34,3 +35,4 @@ pub use bird::BirdRepository;
 pub use clutch::ClutchRepository;
 pub use egg::EggRepository;
 pub use flock::FlockRepository;
+pub use sync::SyncRepository;

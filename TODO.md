@@ -94,15 +94,15 @@ config, logging, and health check.
 
 **Goal:** The core save-archive lifecycle: upload, list, download, delete, and prune.
 
-- [ ] Storage layout on disk: `/data/flocks/{user_id}/{game_id}/egg_[timestamp].zip`.
-- [ ] `POST /api/clutches/{game_id}/lay` — multipart upload (`.zip` + file hash + source Bird id); verify hash matches payload; create Clutch on first Egg; store file; insert Egg row.
-- [ ] `GET /api/clutches` — list a Flock's tracked games and current status.
-- [ ] `GET /api/clutches/{game_id}/eggs` — Egg metadata / version history for a Clutch.
-- [ ] `GET /api/clutches/{game_id}/hatch/{egg_id}` — stream a specific Egg back for restore.
-- [ ] `DELETE /api/clutches/{game_id}/eggs/{egg_id}` — remove an Egg (DB row + file).
-- [ ] **Brood Limit** enforcement: after `lay`, prune the oldest Eggs beyond the limit (default 10, user-configurable per Clutch); delete both row and file atomically.
-- [ ] Handle partial-upload failures and orphaned files (cleanup / transactional guarantees).
-- [ ] Integration tests: lay 12 Eggs with limit 10 → exactly 10 newest remain; hatch returns correct bytes; delete works.
+- [x] Storage layout on disk: `/data/flocks/{user_id}/{game_id}/egg_[timestamp]_{egg_id}.zip`.
+- [x] `POST /api/clutches/{game_id}/lay` — multipart upload (`.zip` + file hash + source Bird id); verify hash matches payload; create Clutch on first Egg; store file; insert Egg row.
+- [x] `GET /api/clutches` — list a Flock's tracked games and current status.
+- [x] `GET /api/clutches/{game_id}/eggs` — Egg metadata / version history for a Clutch.
+- [x] `GET /api/clutches/{game_id}/hatch/{egg_id}` — stream a specific Egg back for restore.
+- [x] `DELETE /api/clutches/{game_id}/eggs/{egg_id}` — remove an Egg (DB row + file).
+- [x] **Brood Limit** enforcement: after `lay`, prune the oldest Eggs beyond the limit (default 10, user-configurable per Clutch); delete both row and file atomically.
+- [x] Handle partial-upload failures and orphaned files (cleanup / transactional guarantees).
+- [x] Integration tests: lay 12 Eggs with limit 10 → exactly 10 newest remain; hatch returns correct bytes; delete works.
 
 **Exit criteria:** Full CRUD over Eggs works end-to-end, files land in the documented directory structure, and the Brood Limit prunes correctly.
 
@@ -113,12 +113,12 @@ config, logging, and health check.
 **Goal:** Server-side primitives that power "The Flight Home" — hash/timestamp
 comparison and conflict signalling.
 
-- [ ] Pre-launch comparison endpoint/logic: given a game_id + local hash + timestamp, report whether the Nest has a newer Egg, an identical Egg, or a conflict.
-- [ ] Define Clutch/Egg status semantics: **Safe in Nest** (synced), **Flying** (syncing), **Chilly Egg** (conflict).
-- [ ] Conflict detection ("Chilly Egg"): both local and remote modified since last common ancestor.
-- [ ] Conflict resolution endpoint: choose local vs. Nest version ("which egg to keep warm").
-- [ ] Persist last-known-synced state per Bird per Clutch to detect divergence.
-- [ ] Tests covering: newer-remote pull, up-to-date no-op, and conflict paths.
+- [x] Pre-launch comparison endpoint/logic: given a game_id + local hash + timestamp, report whether the Nest has a newer Egg, an identical Egg, or a conflict.
+- [x] Define Clutch/Egg status semantics: **Safe in Nest** (synced), **Flying** (syncing), **Chilly Egg** (conflict).
+- [x] Conflict detection ("Chilly Egg"): both local and remote modified since last common ancestor.
+- [x] Conflict resolution endpoint: choose local vs. Nest version ("which egg to keep warm").
+- [x] Persist last-known-synced state per Bird per Clutch to detect divergence.
+- [x] Tests covering: newer-remote pull, up-to-date no-op, and conflict paths.
 
 **Exit criteria:** Given crafted hash/timestamp inputs, the server correctly classifies pull / no-op / conflict and supports an explicit resolution choice.
 

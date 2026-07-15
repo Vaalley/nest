@@ -77,6 +77,19 @@ impl SyncStatus {
     }
 }
 
+impl std::str::FromStr for SyncStatus {
+    type Err = String;
+
+    fn from_str(s: &str) -> Result<Self, Self::Err> {
+        match s {
+            "safe_in_nest" => Ok(SyncStatus::SafeInNest),
+            "flying" => Ok(SyncStatus::Flying),
+            "chilly_egg" => Ok(SyncStatus::ChillyEgg),
+            _ => Err(format!("unknown sync status: {s}")),
+        }
+    }
+}
+
 /// A user account.
 #[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct Flock {

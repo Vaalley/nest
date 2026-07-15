@@ -41,6 +41,9 @@ pub enum AppError {
     #[error(transparent)]
     Migration(#[from] sqlx::migrate::MigrateError),
 
+    #[error(transparent)]
+    Io(#[from] std::io::Error),
+
     #[error("internal error: {0}")]
     Internal(String),
 }
@@ -58,6 +61,7 @@ impl AppError {
             AppError::Config(_)
             | AppError::Database(_)
             | AppError::Migration(_)
+            | AppError::Io(_)
             | AppError::Internal(_) => StatusCode::INTERNAL_SERVER_ERROR,
         }
     }
@@ -73,6 +77,7 @@ impl AppError {
             AppError::RateLimited => "rate_limited",
             AppError::Conflict(_) => "conflict",
             AppError::Database(_) | AppError::Migration(_) => "database_error",
+            AppError::Io(_) => "io_error",
             AppError::Internal(_) => "internal_error",
         }
     }
@@ -81,9 +86,10 @@ impl AppError {
     /// message and logged instead of leaked over the wire.
     fn client_message(&self) -> String {
         match self {
-            AppError::Database(_) | AppError::Migration(_) | AppError::Internal(_) => {
-                "an internal error occurred".to_string()
-            }
+            AppError::Database(_)
+            | AppError::Migration(_)
+            | AppError::Io(_)
+            | AppError::Internal(_) => "an internal error occurred".to_string(),
             other => other.to_string(),
         }
     }

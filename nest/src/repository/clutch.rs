@@ -77,6 +77,19 @@ impl ClutchRepository {
         row.map(ClutchRow::into_domain).transpose()
     }
 
+    /// Return an existing Clutch for a `(flock, game)` pair, creating it if necessary.
+    pub async fn find_or_create(
+        &self,
+        flock_id: Uuid,
+        game_id: &str,
+        brood_limit: i64,
+    ) -> AppResult<Clutch> {
+        if let Some(clutch) = self.find_by_game(flock_id, game_id).await? {
+            return Ok(clutch);
+        }
+        self.create(flock_id, game_id, brood_limit).await
+    }
+
     /// List all Clutches for a Flock, newest first.
     pub async fn list_by_flock(&self, flock_id: Uuid) -> AppResult<Vec<Clutch>> {
         let rows = sqlx::query_as::<_, ClutchRow>(

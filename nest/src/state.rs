@@ -6,7 +6,9 @@ use sqlx::SqlitePool;
 
 use crate::config::Config;
 use crate::rate_limit::{RateLimiter, DEFAULT_MAX_REQUESTS, DEFAULT_WINDOW};
-use crate::repository::{BirdRepository, ClutchRepository, EggRepository, FlockRepository};
+use crate::repository::{
+    BirdRepository, ClutchRepository, EggRepository, FlockRepository, SyncRepository,
+};
 
 /// Cloneable application state (cheap: everything behind `Arc`/pool handle).
 #[derive(Clone)]
@@ -22,6 +24,7 @@ struct Inner {
     birds: BirdRepository,
     clutches: ClutchRepository,
     eggs: EggRepository,
+    sync: SyncRepository,
 }
 
 impl AppState {
@@ -31,6 +34,7 @@ impl AppState {
         let birds = BirdRepository::new(pool.clone());
         let clutches = ClutchRepository::new(pool.clone());
         let eggs = EggRepository::new(pool.clone());
+        let sync = SyncRepository::new(pool.clone());
 
         Self {
             inner: Arc::new(Inner {
@@ -41,6 +45,7 @@ impl AppState {
                 birds,
                 clutches,
                 eggs,
+                sync,
             }),
         }
     }
@@ -71,5 +76,9 @@ impl AppState {
 
     pub fn eggs(&self) -> &EggRepository {
         &self.inner.eggs
+    }
+
+    pub fn sync(&self) -> &SyncRepository {
+        &self.inner.sync
     }
 }

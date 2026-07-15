@@ -29,12 +29,12 @@ every later phase builds on stable ground.
 - [x] Add `rust-toolchain.toml` pinning the toolchain; enable `clippy` and `rustfmt`.
 - [x] Add `.editorconfig`, `.gitignore` (Rust `target/`, Tauri build output, `.env`, `/data`).
 - [x] Add `rustfmt.toml` and `clippy.toml`; agree on lint policy (`-D warnings` in CI).
-- [ ] Set up pre-commit hooks (`.pre-commit-config.yaml` or a Husky-style hook) running `cargo fmt --check` + `cargo clippy`.
-- [ ] GitHub Actions CI: matrix build (Linux + Windows), `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test`.
+- [x] Set up pre-commit hooks (`.pre-commit-config.yaml` or a Husky-style hook) running `cargo fmt --check` + `cargo clippy`. _(`.pre-commit-config.yaml` local hooks.)_
+- [x] GitHub Actions CI: matrix build (Linux + Windows), `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test`. _(`.github/workflows/ci.yml`.)_
 - [~] Choose and document core dependencies (web framework e.g. `axum`, `sqlx` or `rusqlite`, `serde`, `tokio`, `tracing`, `argon2`, `jsonwebtoken`, `zip`, `blake3`/`sha2`). _(Phase 1 set: `axum`, `sqlx`+`sqlite`, `serde`, `tokio`, `tracing`, `thiserror`, `time`, `uuid`. Auth/packaging crates land in later phases.)_
-- [~] Root `README` updates: dev setup, build, run instructions per crate. _(`.env.example` added; full README dev section still pending.)_
+- [x] Root `README` updates: dev setup, build, run instructions per crate. _(Development section in `README.md` + `.env.example`.)_
 
-**Exit criteria:** `cargo build`, `cargo fmt --check`, `cargo clippy`, and `cargo test` all pass locally and in CI on Linux + Windows. _(All pass locally on Windows; CI matrix still to be added.)_
+**Exit criteria:** `cargo build`, `cargo fmt --check`, `cargo clippy`, and `cargo test` all pass locally and in CI on Linux + Windows. _(All pass locally on Windows; CI workflow added to run the matrix on Linux + Windows.)_
 
 ---
 

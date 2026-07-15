@@ -1,0 +1,18 @@
+# Run `pre-commit install` once to enable these hooks.
+# Local hooks so contributors use the repo-pinned toolchain (rust-toolchain.toml).
+repos:
+  - repo: local
+    hooks:
+      - id: cargo-fmt
+        name: cargo fmt
+        entry: cargo fmt --all --
+        language: system
+        types: [rust]
+        pass_filenames: false
+
+      - id: cargo-clippy
+        name: cargo clippy
+        entry: cargo clippy --all-targets --all-features -- -D warnings
+        language: system
+        types: [rust]
+        pass_filenames: false

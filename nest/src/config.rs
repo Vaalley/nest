@@ -17,6 +17,7 @@ mod env_keys {
     pub const DB_PATH: &str = "NEST_DB_PATH";
     pub const BROOD_LIMIT: &str = "NEST_BROOD_LIMIT";
     pub const TOKEN_SECRET: &str = "NEST_TOKEN_SECRET";
+    pub const TOKEN_EXPIRY_SECONDS: &str = "NEST_TOKEN_EXPIRY_SECONDS";
     pub const LOG_LEVEL: &str = "NEST_LOG";
 }
 
@@ -35,6 +36,8 @@ pub struct Config {
     pub default_brood_limit: i64,
     /// Secret used to sign/verify auth tokens (consumed in Phase 2).
     pub token_secret: String,
+    /// Token lifetime in seconds (default 7 days).
+    pub token_expiry_seconds: u64,
     /// Tracing filter directive (e.g. `info`, `nest=debug`).
     pub log_level: String,
 }
@@ -69,6 +72,14 @@ impl Config {
         }
 
         let token_secret = env_or(env_keys::TOKEN_SECRET, "dev-insecure-secret-change-me");
+
+        let token_expiry_seconds = match std::env::var(env_keys::TOKEN_EXPIRY_SECONDS) {
+            Ok(v) if !v.trim().is_empty() => v.trim().parse::<u64>().map_err(|e| {
+                AppError::Config(format!("invalid {}: {e}", env_keys::TOKEN_EXPIRY_SECONDS))
+            })?,
+            _ => 7 * 24 * 60 * 60,
+        };
+
         let log_level = env_or(env_keys::LOG_LEVEL, "info");
 
         Ok(Self {
@@ -77,6 +88,7 @@ impl Config {
             db_path,
             default_brood_limit,
             token_secret,
+            token_expiry_seconds,
             log_level,
         })
     }
@@ -100,6 +112,7 @@ impl std::fmt::Debug for Config {
             .field("db_path", &self.db_path)
             .field("default_brood_limit", &self.default_brood_limit)
             .field("token_secret", &"<redacted>")
+            .field("token_expiry_seconds", &self.token_expiry_seconds)
             .field("log_level", &self.log_level)
             .finish()
     }

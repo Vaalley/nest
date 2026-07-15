@@ -26,6 +26,12 @@ pub enum AppError {
     #[error("unauthorized")]
     Unauthorized,
 
+    #[error("forbidden")]
+    Forbidden,
+
+    #[error("rate limit exceeded")]
+    RateLimited,
+
     #[error("conflict: {0}")]
     Conflict(String),
 
@@ -46,6 +52,8 @@ impl AppError {
             AppError::NotFound => StatusCode::NOT_FOUND,
             AppError::Validation(_) => StatusCode::BAD_REQUEST,
             AppError::Unauthorized => StatusCode::UNAUTHORIZED,
+            AppError::Forbidden => StatusCode::FORBIDDEN,
+            AppError::RateLimited => StatusCode::TOO_MANY_REQUESTS,
             AppError::Conflict(_) => StatusCode::CONFLICT,
             AppError::Config(_)
             | AppError::Database(_)
@@ -61,6 +69,8 @@ impl AppError {
             AppError::NotFound => "not_found",
             AppError::Validation(_) => "validation_error",
             AppError::Unauthorized => "unauthorized",
+            AppError::Forbidden => "forbidden",
+            AppError::RateLimited => "rate_limited",
             AppError::Conflict(_) => "conflict",
             AppError::Database(_) | AppError::Migration(_) => "database_error",
             AppError::Internal(_) => "internal_error",

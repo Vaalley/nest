@@ -3,12 +3,16 @@
 //! Exposes the building blocks (config, state, router, migrations) so both the
 //! binary and integration tests can construct a fully-wired application.
 
+pub mod auth;
 pub mod config;
 pub mod db;
 pub mod error;
+pub mod rate_limit;
 pub mod repository;
 pub mod routes;
 pub mod state;
+
+use std::net::SocketAddr;
 
 use tokio::net::TcpListener;
 
@@ -42,7 +46,7 @@ pub async fn build_state(config: Config) -> AppResult<AppState> {
 pub async fn run(config: Config) -> AppResult<()> {
     let bind_addr = config.bind_addr;
     let state = build_state(config).await?;
-    let app = routes::router(state);
+    let app = routes::router(state).into_make_service_with_connect_info::<SocketAddr>();
 
     let listener = TcpListener::bind(bind_addr)
         .await

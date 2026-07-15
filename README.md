@@ -39,7 +39,7 @@ cargo run --bin nest        # run the Nest server
 ### Running the Nest server
 
 Configuration is read from environment variables (all optional; see
-[`.env.example`](./.env.example)). By default the server binds `127.0.0.1:8080`,
+[`.env.example`](./.env.example)). By default the server binds `127.0.0.1:8140`,
 stores its SQLite DB and Eggs under `./data`, issues HMAC-SHA256 signed tokens
 using `NEST_TOKEN_SECRET`, and expires them after 7 days.
 
@@ -47,24 +47,24 @@ using `NEST_TOKEN_SECRET`, and expires them after 7 days.
 cargo run --bin nest
 
 # Health check
-curl http://127.0.0.1:8080/health
+curl http://127.0.0.1:8140/health
 
 # Authentication
-curl -X POST http://127.0.0.1:8080/api/flock/register \
+curl -X POST http://127.0.0.1:8140/api/flock/register \
   -H 'Content-Type: application/json' \
   -d '{"username":"valley","password":"correct-horse-battery-staple"}'
 
-curl -X POST http://127.0.0.1:8080/api/flock/login \
+curl -X POST http://127.0.0.1:8140/api/flock/login \
   -H 'Content-Type: application/json' \
   -d '{"username":"valley","password":"correct-horse-battery-staple"}'
 
 # Device management (replace $TOKEN with the value returned above)
-curl -X POST http://127.0.0.1:8080/api/birds \
+curl -X POST http://127.0.0.1:8140/api/birds \
   -H 'Content-Type: application/json' \
   -H "Authorization: Bearer $TOKEN" \
   -d '{"name":"Main Desktop","platform":"windows"}'
 
-curl http://127.0.0.1:8080/api/birds \
+curl http://127.0.0.1:8140/api/birds \
   -H "Authorization: Bearer $TOKEN"
 ```
 

@@ -1,0 +1,27 @@
+# Rust
+/target
+**/target
+Cargo.lock.orig
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+
+# Nest runtime data (Eggs, SQLite DB)
+/data
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+*.db
+
+# Tauri build output (Bird client, added in later phases)
+bird/src-tauri/target
+bird/dist
+node_modules
+
+# Editor / OS
+.DS_Store
+.idea
+.vscode
+*.swp

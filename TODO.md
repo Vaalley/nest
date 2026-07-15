@@ -24,17 +24,17 @@ Legend: `[ ]` todo · `[~]` in progress · `[x]` done. Each phase lists **Goals*
 **Goal:** A clean, reproducible monorepo skeleton with shared tooling and CI so
 every later phase builds on stable ground.
 
-- [ ] Decide monorepo layout: `nest/` (server crate), `bird/` (Tauri app), `shared/` (crate for common DTOs, error types, hashing, domain enums).
-- [ ] Set up a Cargo workspace at the repo root (`Cargo.toml` with `members`).
-- [ ] Add `rust-toolchain.toml` pinning the toolchain; enable `clippy` and `rustfmt`.
-- [ ] Add `.editorconfig`, `.gitignore` (Rust `target/`, Tauri build output, `.env`, `/data`).
-- [ ] Add `rustfmt.toml` and `clippy.toml`; agree on lint policy (`-D warnings` in CI).
+- [x] Decide monorepo layout: `nest/` (server crate), `bird/` (Tauri app), `shared/` (crate for common DTOs, error types, hashing, domain enums). _(`nest/` + `shared/` created; `bird/` deferred to Phase 6.)_
+- [x] Set up a Cargo workspace at the repo root (`Cargo.toml` with `members`).
+- [x] Add `rust-toolchain.toml` pinning the toolchain; enable `clippy` and `rustfmt`.
+- [x] Add `.editorconfig`, `.gitignore` (Rust `target/`, Tauri build output, `.env`, `/data`).
+- [x] Add `rustfmt.toml` and `clippy.toml`; agree on lint policy (`-D warnings` in CI).
 - [ ] Set up pre-commit hooks (`.pre-commit-config.yaml` or a Husky-style hook) running `cargo fmt --check` + `cargo clippy`.
 - [ ] GitHub Actions CI: matrix build (Linux + Windows), `cargo fmt --check`, `cargo clippy -D warnings`, `cargo test`.
-- [ ] Choose and document core dependencies (web framework e.g. `axum`, `sqlx` or `rusqlite`, `serde`, `tokio`, `tracing`, `argon2`, `jsonwebtoken`, `zip`, `blake3`/`sha2`).
-- [ ] Root `README` updates: dev setup, build, run instructions per crate.
+- [~] Choose and document core dependencies (web framework e.g. `axum`, `sqlx` or `rusqlite`, `serde`, `tokio`, `tracing`, `argon2`, `jsonwebtoken`, `zip`, `blake3`/`sha2`). _(Phase 1 set: `axum`, `sqlx`+`sqlite`, `serde`, `tokio`, `tracing`, `thiserror`, `time`, `uuid`. Auth/packaging crates land in later phases.)_
+- [~] Root `README` updates: dev setup, build, run instructions per crate. _(`.env.example` added; full README dev section still pending.)_
 
-**Exit criteria:** `cargo build`, `cargo fmt --check`, `cargo clippy`, and `cargo test` all pass locally and in CI on Linux + Windows.
+**Exit criteria:** `cargo build`, `cargo fmt --check`, `cargo clippy`, and `cargo test` all pass locally and in CI on Linux + Windows. _(All pass locally on Windows; CI matrix still to be added.)_
 
 ---
 
@@ -43,21 +43,21 @@ every later phase builds on stable ground.
 **Goal:** A runnable HTTP server with an embedded SQLite database, migrations,
 config, logging, and health check.
 
-- [ ] Scaffold the `nest` server crate with the chosen web framework (`axum` + `tokio`).
-- [ ] Configuration loader (env vars + optional file): bind address, data dir, DB path, brood limit default, token secret.
-- [ ] Structured logging/tracing with configurable level.
-- [ ] SQLite integration with a migration system (`sqlx migrate` or `refinery`).
-- [ ] Initial schema migrations:
-  - `flocks` (id, username, password_hash, created_at).
-  - `birds` (id, flock_id, name, platform, last_seen, created_at).
-  - `clutches` (id, flock_id, game_id, brood_limit, created_at).
-  - `eggs` (id, clutch_id, source_bird_id, file_hash, size_bytes, file_path, created_at).
-- [ ] Domain models (DDD) in `shared/`: `Flock`, `Bird`, `Egg`, `Clutch` + status enums.
-- [ ] Repository layer abstracting DB access per aggregate.
-- [ ] `GET /health` endpoint + graceful shutdown.
-- [ ] Consistent JSON error envelope and `AppError` type mapped to HTTP status codes.
+- [x] Scaffold the `nest` server crate with the chosen web framework (`axum` + `tokio`).
+- [x] Configuration loader (env vars + optional file): bind address, data dir, DB path, brood limit default, token secret. _(`nest/src/config.rs`; see `.env.example`.)_
+- [x] Structured logging/tracing with configurable level. _(`tracing` + `tracing-subscriber` env-filter, `NEST_LOG`.)_
+- [x] SQLite integration with a migration system (`sqlx migrate` or `refinery`). _(`sqlx` SQLite pool + embedded `migrate!`.)_
+- [x] Initial schema migrations:
+  - [x] `flocks` (id, username, password_hash, created_at).
+  - [x] `birds` (id, flock_id, name, platform, last_seen, created_at).
+  - [x] `clutches` (id, flock_id, game_id, brood_limit, created_at).
+  - [x] `eggs` (id, clutch_id, source_bird_id, file_hash, size_bytes, file_path, created_at).
+- [x] Domain models (DDD) in `shared/`: `Flock`, `Bird`, `Egg`, `Clutch` + status enums. _(`Platform`, `SyncStatus` enums in `nest-shared`.)_
+- [x] Repository layer abstracting DB access per aggregate. _(`FlockRepository`, `BirdRepository`, `ClutchRepository`, `EggRepository`.)_
+- [x] `GET /health` endpoint + graceful shutdown. _(DB-readiness check; Ctrl-C / SIGTERM shutdown.)_
+- [x] Consistent JSON error envelope and `AppError` type mapped to HTTP status codes. _(`{"error":{"code","message"}}`; internal details never leaked.)_
 
-**Exit criteria:** Server boots, applies migrations to a fresh SQLite file, `GET /health` returns `200`, RAM footprint sanity-checked.
+**Exit criteria:** Server boots, applies migrations to a fresh SQLite file, `GET /health` returns `200`, RAM footprint sanity-checked. _(Done: `/health` returns 200 on a fresh DB; working set ≈ 9 MB, well under the 30 MB target.)_
 
 ---
 

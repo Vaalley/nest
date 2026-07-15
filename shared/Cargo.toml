@@ -1,0 +1,15 @@
+[package]
+name = "nest-shared"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[lib]
+name = "nest_shared"
+path = "src/lib.rs"
+
+[dependencies]
+serde = { workspace = true }
+time = { workspace = true }
+uuid = { workspace = true }

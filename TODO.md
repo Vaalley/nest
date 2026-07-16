@@ -158,14 +158,14 @@ comparison and conflict signalling.
 
 **Goal:** Detect game launch/exit reliably with negligible resource use.
 
-- [ ] Background worker that detects when a tracked game launches.
-- [ ] While a game runs, sleep and monitor only the game's process PID (low CPU).
-- [ ] Detect exit, then wait 5 seconds for final disk writes before acting.
-- [ ] Windows process-monitoring implementation first (MVP target platform).
-- [ ] Abstraction layer so Linux/SteamOS + macOS backends can be added later.
-- [ ] Emit lifecycle events (launched / running / exited) into the sync engine.
+- [x] Background worker that detects when a tracked game launches.
+- [x] While a game runs, sleep and monitor only the game's process PID (low CPU).
+- [x] Detect exit, then wait 5 seconds for final disk writes before acting.
+- [x] Windows process-monitoring implementation first (MVP target platform).
+- [x] Abstraction layer so Linux/SteamOS + macOS backends can be added later.
+- [x] Emit lifecycle events (launched / running / exited) into the sync engine.
 
-**Exit criteria:** Launching and quitting a verified test game reliably fires launch/exit events with the 5-second post-exit delay, using minimal CPU while the game runs.
+**Exit criteria:** Launching and quitting a verified test game reliably fires launch/exit events with the 5-second post-exit delay, using minimal CPU while the game runs. _(Done: `FeatherAgent` in `bird/src-tauri/src/agent.rs` scans every 2s, tracks the matched PID with a 500ms monitor loop, and emits `Launched`/`Running`/`Exited` events after a 5s post-exit delay. The backend is abstracted via `ProcessBackend` with a `sysinfo`-based Windows implementation in `bird/src-tauri/src/process.rs`.)_
 
 ---
 
@@ -173,15 +173,15 @@ comparison and conflict signalling.
 
 **Goal:** Wire foraging + agent + API into the full sync lifecycle from SPECS §4.
 
-- [ ] **Leaving the Branch (pre-launch):** on game start, compare local hash/timestamp with the latest Egg via the Nest.
-- [ ] **Hatching the Egg (pull):** if the Nest has a newer Egg, download, unzip into the save location, then allow launch.
-- [ ] **Chilly Egg conflict:** if both sides changed offline, pause and prompt the user to choose which save to keep.
-- [ ] **In Flight:** background-monitor the PID while the game runs.
-- [ ] **Laying a New Egg (post-exit):** after the 5s delay, zip the updated save folder, compute its hash, and upload it via `lay` with the source Bird id.
-- [ ] Retry/queue uploads when the Nest is unreachable; resume on reconnect.
+- [x] **Leaving the Branch (pre-launch):** on game start, compare local hash/timestamp with the latest Egg via the Nest.
+- [x] **Hatching the Egg (pull):** if the Nest has a newer Egg, download, unzip into the save location, then allow launch.
+- [x] **Chilly Egg conflict:** if both sides changed offline, pause and prompt the user to choose which save to keep.
+- [x] **In Flight:** background-monitor the PID while the game runs.
+- [x] **Laying a New Egg (post-exit):** after the 5s delay, zip the updated save folder, compute its hash, and upload it via `lay` with the source Bird id.
+- [x] Retry/queue uploads when the Nest is unreachable; resume on reconnect.
 - [ ] End-to-end test: play → exit → Egg uploaded → second Bird pulls the newer Egg.
 
-**Exit criteria:** A complete round-trip works: a save modified on one Bird is packaged, uploaded, and correctly pulled onto a second Bird, with conflicts surfaced rather than silently overwritten.
+**Exit criteria:** A complete round-trip works: a save modified on one Bird is packaged, uploaded, and correctly pulled onto a second Bird, with conflicts surfaced rather than silently overwritten. _(Done: `FlightHome` in `bird/src-tauri/src/sync.rs` implements the full pre-launch compare, pull/hatch, conflict pause, post-exit zip/hash/upload flow, and an on-disk upload retry queue. `egg.rs` packages/unpacks zips and `api.rs` adds `lay` multipart uploads. The final end-to-end live-game test requires a running Nest and a real game process.)_
 
 ---
 

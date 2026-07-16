@@ -49,6 +49,12 @@ pub enum BirdError {
     #[error("save path does not exist: {0}")]
     SavePathNotFound(PathBuf),
 
+    #[error("archive error: {0}")]
+    Archive(String),
+
+    #[error("sync engine error: {0}")]
+    Sync(String),
+
     #[error("internal error: {0}")]
     Internal(String),
 }
@@ -65,6 +71,8 @@ impl BirdError {
                 "The save folder for this game was not found.".to_string()
             }
             BirdError::GameNotFound(id) => format!("Unknown game: {id}"),
+            BirdError::Archive(msg) => format!("Archive error: {msg}"),
+            BirdError::Sync(msg) => format!("Sync error: {msg}"),
             other => other.to_string(),
         }
     }
@@ -84,8 +92,16 @@ impl BirdError {
             BirdError::NotRegistered => "not_registered",
             BirdError::GameNotFound(_) => "game_not_found",
             BirdError::SavePathNotFound(_) => "save_path_not_found",
+            BirdError::Archive(_) => "archive_error",
+            BirdError::Sync(_) => "sync_error",
             BirdError::Internal(_) => "internal_error",
         }
+    }
+}
+
+impl From<zip::result::ZipError> for BirdError {
+    fn from(err: zip::result::ZipError) -> Self {
+        BirdError::Archive(err.to_string())
     }
 }
 

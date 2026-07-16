@@ -106,7 +106,7 @@ pub struct CompareResponse {
 }
 
 /// Resolution chosen for a Chilly Egg conflict.
-#[derive(Debug, Deserialize, Serialize)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum Resolution {
     /// Keep the Nest's Egg.

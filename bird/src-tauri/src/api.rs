@@ -161,6 +161,35 @@ impl NestClient {
         Ok(resp.bytes().await?.to_vec())
     }
 
+    /// `POST /api/clutches/{game_id}/lay`
+    pub async fn lay(
+        &self,
+        game_id: &str,
+        source_bird_id: uuid::Uuid,
+        zip_bytes: Vec<u8>,
+        file_hash: &str,
+    ) -> BirdResult<Egg> {
+        let token = self.token.as_ref().ok_or(BirdError::NotAuthenticated)?;
+        let file_part = reqwest::multipart::Part::bytes(zip_bytes)
+            .file_name("egg.zip")
+            .mime_str("application/zip")?;
+        let form = reqwest::multipart::Form::new()
+            .part("file", file_part)
+            .text("file_hash", file_hash.to_string())
+            .text("source_bird_id", source_bird_id.to_string());
+
+        let url = format!("{}/api/clutches/{}/lay", self.base_url, game_id);
+        let resp = self
+            .client
+            .post(&url)
+            .header(reqwest::header::AUTHORIZATION, format!("Bearer {token}"))
+            .multipart(form)
+            .send()
+            .await?;
+        let resp = Self::check_status(resp).await?;
+        Ok(resp.json().await?)
+    }
+
     async fn get<T: serde::de::DeserializeOwned>(&self, path: &str) -> BirdResult<T> {
         let req = self.auth_request(reqwest::Method::GET, path)?;
         let resp = req.send().await?;

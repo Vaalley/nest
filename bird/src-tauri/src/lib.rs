@@ -3,15 +3,20 @@
 //! This crate implements the frontend-facing commands and background services
 //! that turn a local gaming device into a Bird. Phase 6 scaffolds the Tauri
 //! app, config store, and API client; Phase 7 adds the Foraging Engine that
-//! discovers save locations via the Ludusavi manifest.
+//! discovers save locations via the Ludusavi manifest; Phases 8 and 9 add the
+//! Feather Agent (process monitoring) and the Flight Home sync engine.
 
+pub mod agent;
 pub mod api;
 pub mod commands;
 pub mod config;
+pub mod egg;
 pub mod error;
 pub mod forage;
+pub mod process;
 pub mod state;
 pub mod storage;
+pub mod sync;
 
 use tauri::tray::TrayIconBuilder;
 use tauri::{async_runtime, Manager, RunEvent, WindowEvent};
@@ -28,6 +33,7 @@ pub fn run() {
             std::process::exit(1);
         }
     };
+    let bg_state = app_state.clone();
 
     let app = tauri::Builder::default()
         .manage(app_state)
@@ -50,9 +56,22 @@ pub fn run() {
             commands::refresh_manifest,
             commands::discover_games,
             commands::discover_game,
+            commands::watch_game,
+            commands::unwatch_game,
+            commands::watched_games,
+            commands::sync_status,
+            commands::sync_now,
+            commands::resolve_and_sync,
         ])
         .build(tauri::generate_context!())
         .expect("failed to build Tauri application");
+
+    let app_handle = app.handle().clone();
+    async_runtime::spawn(async move {
+        if let Err(err) = bg_state.start_background(app_handle).await {
+            tracing::error!(%err, "failed to start background sync engine");
+        }
+    });
 
     app.run(move |app_handle, event| {
         if let RunEvent::WindowEvent {

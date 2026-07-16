@@ -8,6 +8,7 @@ use crate::api::NestClient;
 use crate::config::{AppConfig, ConfigStore};
 use crate::error::{BirdError, BirdResult};
 use crate::forage::ForagingEngine;
+use crate::sync::FlightHome;
 
 /// Shared application state injected into Tauri commands.
 #[derive(Clone)]
@@ -18,7 +19,8 @@ pub struct AppState {
 struct Inner {
     config_store: ConfigStore,
     forager: ForagingEngine,
-    client: RwLock<Option<NestClient>>,
+    client: Arc<RwLock<Option<NestClient>>>,
+    flight: FlightHome,
 }
 
 impl AppState {
@@ -39,11 +41,15 @@ impl AppState {
             None
         };
 
+        let client = Arc::new(RwLock::new(client));
+        let flight = FlightHome::new(config_store.clone(), forager.clone(), client.clone())?;
+
         Ok(Self {
             inner: Arc::new(Inner {
                 config_store,
                 forager,
-                client: RwLock::new(client),
+                client,
+                flight,
             }),
         })
     }
@@ -59,6 +65,10 @@ impl AppState {
 
     pub fn forager(&self) -> &ForagingEngine {
         &self.inner.forager
+    }
+
+    pub fn flight(&self) -> &FlightHome {
+        &self.inner.flight
     }
 
     /// Return the currently authenticated Nest client, if any.
@@ -111,5 +121,11 @@ impl AppState {
         self.set_config(new_config).await?;
         self.set_client(None).await;
         Ok(())
+    }
+
+    /// Start the background agent and sync engine. Called once from Tauri's
+    /// setup hook.
+    pub async fn start_background(&self, app_handle: tauri::AppHandle) -> BirdResult<()> {
+        self.flight().start(app_handle).await
     }
 }

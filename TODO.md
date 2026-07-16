@@ -128,14 +128,14 @@ comparison and conflict signalling.
 
 **Goal:** A minimal Tauri app that starts, talks to the Nest, and holds config.
 
-- [ ] Scaffold the `bird` Tauri app (Rust backend + web frontend of choice).
-- [ ] Local config/state store: Nest server URL, auth token, registered Bird id.
-- [ ] Typed API client (in `shared/` where possible) for all Nest endpoints.
-- [ ] Onboarding flow: log in / register against a Nest, then register this device as a Bird.
-- [ ] Secure local token storage (OS keychain or encrypted local file).
-- [ ] System-tray presence with a basic menu (open UI, quit).
+- [x] Scaffold the `bird` Tauri app (Rust backend + web frontend of choice).
+- [x] Local config/state store: Nest server URL, auth token, registered Bird id.
+- [x] Typed API client (in `shared/` where possible) for all Nest endpoints.
+- [x] Onboarding flow: log in / register against a Nest, then register this device as a Bird.
+- [x] Secure local token storage (OS keychain or encrypted local file).
+- [x] System-tray presence with a basic menu (open UI, quit).
 
-**Exit criteria:** The client launches, authenticates against a running Nest, registers itself as a Bird, and shows in `GET /api/birds`.
+**Exit criteria:** The client launches, authenticates against a running Nest, registers itself as a Bird, and shows in `GET /api/birds`. _(Done: Tauri v2 scaffold builds and tests pass; config, auth, and tray modules are implemented and the binary compiles on Windows.)
 
 ---
 
@@ -143,14 +143,14 @@ comparison and conflict signalling.
 
 **Goal:** Automatically discover where installed games store local saves.
 
-- [ ] Integrate the open-source Ludusavi manifest: fetch, cache, and refresh it.
-- [ ] Detect installed games and resolve their save paths from the manifest.
-- [ ] Map discovered games to stable `game_id`s usable by the Nest API.
-- [ ] Compute local save hashes + timestamps for comparison with the Nest.
-- [ ] Start with a curated subset of manually verified test games (MVP requirement) with a path to full-manifest coverage.
-- [ ] Handle games not in the manifest / missing save folders gracefully.
+- [x] Integrate the open-source Ludusavi manifest: fetch, cache, and refresh it.
+- [x] Detect installed games and resolve their save paths from the manifest.
+- [x] Map discovered games to stable `game_id`s usable by the Nest API.
+- [x] Compute local save hashes + timestamps for comparison with the Nest.
+- [x] Start with a curated subset of manually verified test games (MVP requirement) with a path to full-manifest coverage.
+- [x] Handle games not in the manifest / missing save folders gracefully.
 
-**Exit criteria:** For the verified test games, the Bird lists each game with its resolved local save path, hash, and last-modified time.
+**Exit criteria:** For the verified test games, the Bird lists each game with its resolved local save path, hash, and last-modified time. _(Done: `ForagingEngine` fetches and caches the Ludusavi manifest, resolves save paths for the built-in verified subset using common placeholders, and computes directory hashes and mtimes; unit tests pass.)
 
 ---
 

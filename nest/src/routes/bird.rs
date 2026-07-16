@@ -2,25 +2,13 @@
 
 use axum::extract::State;
 use axum::Json;
-use serde::{Deserialize, Serialize};
 
+use nest_shared::api::{RegisterBirdRequest, RegisterBirdResponse};
 use nest_shared::domain::{Bird, Platform};
 
 use crate::auth::{create_token, AuthContext};
 use crate::error::{AppError, AppResult};
 use crate::state::AppState;
-
-#[derive(Debug, Deserialize)]
-pub struct RegisterBirdRequest {
-    name: String,
-    platform: String,
-}
-
-#[derive(Debug, Serialize)]
-pub struct RegisterBirdResponse {
-    bird: Bird,
-    token: String,
-}
 
 /// `POST /api/birds/register` — register a new device for the authenticated Flock.
 pub async fn register(

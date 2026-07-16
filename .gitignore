@@ -17,6 +17,7 @@ Cargo.lock.orig
 
 # Tauri build output (Bird client, added in later phases)
 bird/src-tauri/target
+bird/src-tauri/gen
 bird/dist
 node_modules
 

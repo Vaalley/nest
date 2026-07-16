@@ -3,6 +3,12 @@
 //! These types are intentionally transport-agnostic so both the Nest server
 //! and (in later phases) the Bird client can depend on them.
 
+pub mod api;
 pub mod domain;
 
+pub use api::{
+    AuthResponse, ClutchSummary, CompareOutcome, CompareRequest, CompareResponse, DiscoveredGame,
+    GameEntry, LoginRequest, RegisterBirdRequest, RegisterBirdResponse, RegisterFlockRequest,
+    Resolution, ResolveRequest, ResolveResponse,
+};
 pub use domain::{Bird, Clutch, Egg, Flock, Platform, SyncStatus};

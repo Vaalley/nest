@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Nest Bird</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main>
+    <header>
+      <h1>Nest Bird</h1>
+      <p class="subtitle">Keep your game saves safe in the Nest.</p>
+    </header>
+
+    <section id="status" class="card">
+      <h2>Status</h2>
+      <dl id="status-list">
+        <dt>Nest URL</dt><dd id="status-nest-url">—</dd>
+        <dt>Device</dt><dd id="status-bird-name">—</dd>
+        <dt>Platform</dt><dd id="status-platform">—</dd>
+        <dt>Authenticated</dt><dd id="status-auth">—</dd>
+        <dt>Flock</dt><dd id="status-flock">—</dd>
+        <dt>Bird Id</dt><dd id="status-bird-id">—</dd>
+      </dl>
+    </section>
+
+    <section id="config" class="card">
+      <h2>Configuration</h2>
+      <label>
+        Nest URL
+        <input type="text" id="config-nest-url" placeholder="http://127.0.0.1:8140" />
+      </label>
+      <label>
+        Device name
+        <input type="text" id="config-bird-name" placeholder="My PC" />
+      </label>
+      <div class="actions">
+        <button id="btn-save-config">Save</button>
+      </div>
+    </section>
+
+    <section id="auth" class="card">
+      <h2>Authentication</h2>
+      <label>
+        Username
+        <input type="text" id="auth-username" />
+      </label>
+      <label>
+        Password
+        <input type="password" id="auth-password" />
+      </label>
+      <div class="actions">
+        <button id="btn-login">Sign in</button>
+        <button id="btn-register-flock" class="secondary">Create account</button>
+        <button id="btn-register-bird" class="secondary" disabled>Register this device</button>
+        <button id="btn-logout" class="danger">Sign out</button>
+      </div>
+    </section>
+
+    <section id="forage" class="card">
+      <h2>Foraging</h2>
+      <div class="actions">
+        <button id="btn-discover">Discover games</button>
+        <button id="btn-refresh-manifest" class="secondary">Refresh Ludusavi manifest</button>
+      </div>
+      <table id="games-table">
+        <thead>
+          <tr>
+            <th>Game</th>
+            <th>Save path</th>
+            <th>Exists</th>
+            <th>Hash</th>
+            <th>Modified</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </section>
+
+    <section id="sync" class="card">
+      <h2>Sync preview</h2>
+      <div class="actions">
+        <button id="btn-list-clutches">List clutches</button>
+      </div>
+      <ul id="clutches-list"></ul>
+    </section>
+  </main>
+
+  <div id="toast" class="toast hidden"></div>
+  <script src="main.js"></script>
+</body>
+</html>

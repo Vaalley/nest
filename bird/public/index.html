@@ -58,34 +58,37 @@
       </div>
     </section>
 
-    <section id="forage" class="card">
-      <h2>Foraging</h2>
+    <section id="games" class="card">
+      <h2>Games</h2>
       <div class="actions">
-        <button id="btn-discover">Discover games</button>
+        <button id="btn-discover">Scan now</button>
         <button id="btn-refresh-manifest" class="secondary">Refresh Ludusavi manifest</button>
       </div>
-      <table id="games-table">
-        <thead>
-          <tr>
-            <th>Game</th>
-            <th>Save path</th>
-            <th>Exists</th>
-            <th>Hash</th>
-            <th>Modified</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
-    </section>
-
-    <section id="sync" class="card">
-      <h2>Sync preview</h2>
-      <div class="actions">
-        <button id="btn-list-clutches">List clutches</button>
-      </div>
-      <ul id="clutches-list"></ul>
+      <div id="games-loading" class="loading hidden">Scanning your nest…</div>
+      <div id="games-empty" class="empty">No games discovered yet. Click "Scan now".</div>
+      <div id="games-list" class="games-list"></div>
     </section>
   </main>
+
+  <dialog id="history-dialog" class="modal">
+    <h3 id="history-title">Version history</h3>
+    <p id="history-subtitle" class="muted"></p>
+    <div id="history-loading" class="loading hidden">Loading Eggs…</div>
+    <div id="history-empty" class="empty hidden">No Eggs for this game yet.</div>
+    <ul id="history-list"></ul>
+    <div class="actions">
+      <button id="history-close" class="secondary">Close</button>
+    </div>
+  </dialog>
+
+  <dialog id="conflict-dialog" class="modal">
+    <h3>This egg got cold while you were away.</h3>
+    <p>Both your local save and the Nest have changed. Which one do you want to keep warm?</p>
+    <div class="actions">
+      <button id="btn-resolve-nest" class="danger">Keep the Nest's Egg</button>
+      <button id="btn-resolve-local" class="secondary">Keep the local save</button>
+    </div>
+  </dialog>
 
   <div id="toast" class="toast hidden"></div>
   <script src="main.js"></script>

@@ -12,7 +12,7 @@ use std::time::{Duration, Instant};
 use tokio::sync::{broadcast, Mutex, RwLock};
 
 use crate::error::BirdResult;
-use crate::process::{ProcessBackend, SysinfoBackend};
+use crate::process::{default_backend, ProcessBackend};
 
 const POST_EXIT_DELAY: Duration = Duration::from_secs(5);
 const SCAN_INTERVAL: Duration = Duration::from_secs(2);
@@ -91,10 +91,10 @@ impl FeatherAgent {
             .collect()
     }
 
-    /// Start scanning with the default Windows `sysinfo` backend.
+    /// Start scanning with the default `sysinfo` backend.
     pub async fn start(&self) -> BirdResult<()> {
-        let backend = SysinfoBackend::new()?;
-        self.start_with(Box::new(backend)).await
+        let backend = default_backend()?;
+        self.start_with(backend).await
     }
 
     /// Start scanning with a custom backend (useful for tests or future platforms).

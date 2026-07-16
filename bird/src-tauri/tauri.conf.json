@@ -12,8 +12,8 @@
         "title": "Nest Bird",
         "label": "main",
         "url": "index.html",
-        "width": 900,
-        "height": 700,
+        "width": 960,
+        "height": 760,
         "resizable": true,
         "fullscreen": false
       }
@@ -23,6 +23,11 @@
     }
   },
   "bundle": {
-    "active": false
+    "active": true,
+    "targets": "msi",
+    "windows": {
+      "certificateThumbprint": null,
+      "timestampUrl": ""
+    }
   }
 }

@@ -23,7 +23,7 @@ This is a Cargo workspace:
 ### Prerequisites
 
 - A Rust toolchain (see [`rust-toolchain.toml`](./rust-toolchain.toml); `rustup` auto-installs it).
-- On Windows, the MSVC C++ build tools (for linking SQLite).
+- On Windows, either the MSVC C++ build tools or MinGW-w64 with the GNU Rust toolchain.
 
 ### Common commands
 
@@ -77,6 +77,10 @@ The repo ships a [`.pre-commit-config.yaml`](./.pre-commit-config.yaml) that run
 pip install pre-commit   # or: pipx install pre-commit
 pre-commit install
 ```
+
+## Deployment
+
+See [DEPLOY.md](./DEPLOY.md) for containerized server deployment on Docker/Pikapods, Windows Bird installer builds, TLS/secret guidance, backup/restore, and hardening notes.
 
 ## License
 

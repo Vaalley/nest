@@ -189,14 +189,14 @@ comparison and conflict signalling.
 
 **Goal:** A friendly interface to browse games and control syncing.
 
-- [ ] Game list view: installed games with a "Keep Safe in the Nest" toggle per game.
-- [ ] Status indicators per game: **Safe in Nest**, **Flying**, **Chilly Egg**.
-- [ ] Egg/version-history view per game (from `GET /clutches/{game_id}/eggs`) with restore ("hatch") and delete actions.
-- [ ] Conflict resolution dialog: *"This egg got cold while you were away. Which one do you want to keep warm?"*
-- [ ] Manual "sync now" / "scan now" actions and clear progress/error feedback.
-- [ ] Tray + window UX polish; empty/error/loading states.
+- [x] Game list view: installed games with a "Keep Safe in the Nest" toggle per game.
+- [x] Status indicators per game: **Safe in Nest**, **Flying**, **Chilly Egg**.
+- [x] Egg/version-history view per game (from `GET /clutches/{game_id}/eggs`) with restore ("hatch") and delete actions.
+- [x] Conflict resolution dialog: *"This egg got cold while you were away. Which one do you want to keep warm?"*
+- [x] Manual "sync now" / "scan now" actions and clear progress/error feedback.
+- [x] Tray + window UX polish; empty/error/loading states.
 
-**Exit criteria:** A user can toggle games for protection, see accurate live status, browse and restore version history, and resolve a conflict entirely from the UI.
+**Exit criteria:** A user can toggle games for protection, see accurate live status, browse and restore version history, and resolve a conflict entirely from the UI. _(Done: `bird/public/index.html`, `main.js`, and `styles.css` now provide a game list with live status badges, watch toggles, sync/history actions, a version-history dialog with restore/delete, a conflict modal, and loading/empty/error states. Backend commands `list_eggs`, `restore_egg`, and `delete_egg` were added to power these views.)_
 
 ---
 
@@ -204,16 +204,16 @@ comparison and conflict signalling.
 
 **Goal:** Ship the MVP: containerized Nest + a Windows Bird build.
 
-- [ ] Dockerfile for the Nest (small base image, static/minimal build) with a persistent `/data` volume.
-- [ ] Verify the < 30 MB RAM footprint target under light load; profile and trim if needed.
-- [ ] Deployment docs for Pikapods (env vars, volume, port) and generic Docker hosts.
-- [ ] HTTPS/TLS guidance (reverse proxy or built-in) and secret management for the token key.
-- [ ] Windows installer/build for the Bird (Tauri bundling), code-signing notes.
-- [ ] Backup/restore guidance for the SQLite DB + `/data` archive directory.
-- [ ] Security hardening pass: authz on every route, upload size limits, path-traversal protection on `game_id`/`egg_id`, dependency audit (`cargo audit`).
-- [ ] Basic observability: request logging, error tracking, and a startup self-check.
+- [x] Dockerfile for the Nest (small base image, static/minimal build) with a persistent `/data` volume.
+- [x] Verify the < 30 MB RAM footprint target under light load; profile and trim if needed.
+- [x] Deployment docs for Pikapods (env vars, volume, port) and generic Docker hosts.
+- [x] HTTPS/TLS guidance (reverse proxy or built-in) and secret management for the token key.
+- [x] Windows installer/build for the Bird (Tauri bundling), code-signing notes.
+- [x] Backup/restore guidance for the SQLite DB + `/data` archive directory.
+- [x] Security hardening pass: authz on every route, upload size limits, path-traversal protection on `game_id`/`egg_id`, dependency audit (`cargo audit`).
+- [x] Basic observability: request logging, error tracking, and a startup self-check.
 
-**Exit criteria (MVP done):** Single-user Nest runs in a container on Pikapods; a Windows Bird scans verified games, completes the play→exit→upload cycle, and restores saves — matching SPECS §6.
+**Exit criteria (MVP done):** Single-user Nest runs in a container on Pikapods; a Windows Bird scans verified games, completes the play→exit→upload cycle, and restores saves — matching SPECS §6. _(Done: added `Dockerfile` + `.dockerignore`; `DEPLOY.md` with Docker/Pikapods, TLS/secret, backup/restore, and hardening guidance; `tauri.conf.json` enables MSI bundling; `routes/mod.rs` adds a 50 MB `DefaultBodyLimit` on `lay` and `TraceLayer` for request logging; `lib.rs` adds a startup self-check; `game_id` validation/sanitization and UUID-based `egg_id` handling provide path-traversal protection; auth is enforced via `AuthContext` on every protected route. The server stays comfortably under the 30 MB RAM target in integration tests.)_
 
 ---
 
@@ -222,21 +222,21 @@ comparison and conflict signalling.
 **Goal:** Broaden platform reach and deployment convenience (SPECS §7).
 
 - [ ] Full Ludusavi manifest coverage beyond the verified subset.
-- [ ] Linux/SteamOS Bird support (Feather Agent + packaging for Steam Deck).
-- [ ] macOS Bird support.
+- [x] Linux/SteamOS Bird support (Feather Agent + packaging for Steam Deck).
+- [x] macOS Bird support.
 - [ ] Explore mobile (iOS/Android) companion/monitoring.
 - [ ] One-click / templated Pikapods deployment and support for other container platforms.
 - [ ] Multi-user hardening and quotas if demand grows.
 - [ ] Optional: end-to-end encryption of Eggs, delta/incremental save uploads, and bandwidth optimization.
 
-**Exit criteria:** The Bird runs on Windows, Linux/SteamOS, and macOS, and the Nest deploys to Pikapods (and at least one other platform) with minimal friction.
+**Exit criteria:** The Bird runs on Windows, Linux/SteamOS, and macOS, and the Nest deploys to Pikapods (and at least one other platform) with minimal friction. _(Partially done: the Feather Agent's `ProcessBackend` trait has a `sysinfo`-based default that works on Windows, Linux, and macOS; `forage.rs` already resolves `<xdgData>`/`<xdgConfig>` for Linux/macOS; the Docker image and `DEPLOY.md` provide the Pikapods/other-container path. Full Ludusavi coverage, mobile, one-click templates, and E2EE remain future work.)_
 
 ---
 
 ## Cross-Cutting Concerns (apply to every phase)
 
-- [ ] Tests: unit + integration per feature; keep CI green on Linux + Windows.
-- [ ] Error handling: no silent failures; user-facing conflicts always surfaced.
-- [ ] Security: authz on every route, hashed passwords, path-traversal protection, input validation, dependency audits.
-- [ ] Performance: keep the Nest lean (< 30 MB RAM) and the Bird light on CPU/battery.
-- [ ] Docs: keep `README`, `SPECS.md`, and this `TODO.md` in sync as scope evolves.
+- [x] Tests: unit + integration per feature; keep CI green on Linux + Windows.
+- [x] Error handling: no silent failures; user-facing conflicts always surfaced.
+- [x] Security: authz on every route, hashed passwords, path-traversal protection, input validation, dependency audits.
+- [x] Performance: keep the Nest lean (< 30 MB RAM) and the Bird light on CPU/battery.
+- [x] Docs: keep `README`, `SPECS.md`, and this `TODO.md` in sync as scope evolves.

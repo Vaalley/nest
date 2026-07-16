@@ -288,6 +288,28 @@ impl FlightHome {
         })
     }
 
+    /// Download a specific Egg and replace the local save folder with it.
+    pub async fn restore_egg(&self, game_id: &str, egg_id: Uuid) -> BirdResult<SyncResult> {
+        let client = self.require_client().await?;
+        let game = self.forager.discover_one(game_id)?;
+        let save_path = game.save_path.ok_or_else(|| {
+            BirdError::SavePathNotFound(PathBuf::from(format!("save path for {game_id}")))
+        })?;
+
+        let zip = client.hatch(game_id, egg_id).await?;
+        egg::replace_with_egg(&zip, &save_path)?;
+
+        self.set_status(game_id, FlightState::Idle, "Restored the selected Egg")
+            .await;
+
+        Ok(SyncResult {
+            game_id: game_id.to_string(),
+            outcome: Some("restore".to_string()),
+            state: FlightState::Idle,
+            message: "Restored the selected Egg".to_string(),
+        })
+    }
+
     // -----------------------------------------------------------------------
     // Internal lifecycle
     // -----------------------------------------------------------------------

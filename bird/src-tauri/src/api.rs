@@ -161,6 +161,17 @@ impl NestClient {
         Ok(resp.bytes().await?.to_vec())
     }
 
+    /// `DELETE /api/clutches/{game_id}/eggs/{egg_id}`
+    pub async fn delete_egg(&self, game_id: &str, egg_id: uuid::Uuid) -> BirdResult<Egg> {
+        let req = self.auth_request(
+            reqwest::Method::DELETE,
+            &format!("/api/clutches/{game_id}/eggs/{egg_id}"),
+        )?;
+        let resp = req.send().await?;
+        let resp = Self::check_status(resp).await?;
+        Ok(resp.json().await?)
+    }
+
     /// `POST /api/clutches/{game_id}/lay`
     pub async fn lay(
         &self,

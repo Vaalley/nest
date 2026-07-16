@@ -1,0 +1,10 @@
+target/
+.git/
+.github/
+*.md
+.env
+.env.local
+data/
+bird/node_modules/
+bird/dist/
+bird/src-tauri/target/

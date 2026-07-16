@@ -1,8 +1,10 @@
 //! Process-monitoring backends for the Feather Agent.
 //!
-//! Phase 8 targets Windows first but keeps a [`ProcessBackend`] trait so a
-//! Linux / SteamOS / macOS backend can be swapped in later. The default
-//! Windows MVP implementation is built on top of the `sysinfo` crate.
+//! Phase 8 introduced a platform-agnostic [`ProcessBackend`] trait. The
+//! default implementation uses the `sysinfo` crate, which supports Windows,
+//! Linux, macOS, and other Unix-like systems, so the same backend works across
+//! all desktop targets. More specialised backends (e.g. `/proc` on SteamOS) can
+//! be added in the future without touching the agent logic.
 
 use std::path::{Path, PathBuf};
 
@@ -31,7 +33,11 @@ pub trait ProcessBackend: Send + Sync {
     fn find_by_name(&self, names: &[String]) -> Option<ProcessInfo>;
 }
 
-/// Windows MVP process backend using `sysinfo`.
+/// Default process backend using `sysinfo`.
+///
+/// `sysinfo` works on Windows, Linux, and macOS, so this is the default for all
+/// desktop builds. More specialised backends can be selected later by swapping
+/// the backend passed to [`FeatherAgent::start_with`].
 pub struct SysinfoBackend {
     system: sysinfo::System,
 }
@@ -43,6 +49,11 @@ impl SysinfoBackend {
         );
         Ok(Self { system })
     }
+}
+
+/// Create the default process backend for the current platform.
+pub fn default_backend() -> BirdResult<Box<dyn ProcessBackend + Send + Sync>> {
+    Ok(Box::new(SysinfoBackend::new()?))
 }
 
 impl ProcessBackend for SysinfoBackend {

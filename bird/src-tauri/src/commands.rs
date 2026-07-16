@@ -154,6 +154,42 @@ pub async fn list_clutches(state: State<'_, AppState>) -> CommandResult<Vec<Clut
 }
 
 #[tauri::command]
+pub async fn list_eggs(
+    state: State<'_, AppState>,
+    game_id: String,
+) -> CommandResult<Vec<nest_shared::domain::Egg>> {
+    let client = wrap(state.require_client().await)?;
+    wrap(client.list_eggs(&game_id).await)
+}
+
+#[tauri::command]
+pub async fn delete_egg(
+    state: State<'_, AppState>,
+    game_id: String,
+    egg_id: String,
+) -> CommandResult<nest_shared::domain::Egg> {
+    let egg_id = wrap(
+        uuid::Uuid::parse_str(&egg_id)
+            .map_err(|_| BirdError::Validation("invalid egg_id".to_string())),
+    )?;
+    let client = wrap(state.require_client().await)?;
+    wrap(client.delete_egg(&game_id, egg_id).await)
+}
+
+#[tauri::command]
+pub async fn restore_egg(
+    state: State<'_, AppState>,
+    game_id: String,
+    egg_id: String,
+) -> CommandResult<SyncResult> {
+    let egg_id = wrap(
+        uuid::Uuid::parse_str(&egg_id)
+            .map_err(|_| BirdError::Validation("invalid egg_id".to_string())),
+    )?;
+    wrap(state.flight().restore_egg(&game_id, egg_id).await)
+}
+
+#[tauri::command]
 pub async fn compare_game(
     state: State<'_, AppState>,
     game_id: String,

@@ -41,6 +41,7 @@ hmac = "0.12"
 rand = "0.8"
 sha2 = "0.10"
 tokio-util = { version = "0.7", features = ["io"] }
+tower-http = { version = "0.5", features = ["trace"] }
 
 [dev-dependencies]
 tokio = { version = "1", features = ["macros", "rt-multi-thread"] }

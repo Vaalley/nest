@@ -14,6 +14,7 @@ pub mod state;
 
 use std::net::SocketAddr;
 
+use tokio::fs;
 use tokio::net::TcpListener;
 
 pub use config::Config;
@@ -42,9 +43,30 @@ pub async fn build_state(config: Config) -> AppResult<AppState> {
     Ok(AppState::new(config, pool))
 }
 
+/// Verify the environment is ready before starting the HTTP server.
+async fn startup_self_check(config: &Config) -> AppResult<()> {
+    fs::create_dir_all(&config.data_dir)
+        .await
+        .map_err(|e| AppError::Config(format!("cannot create data dir: {e}")))?;
+
+    if let Some(db_parent) = config.db_path.parent() {
+        fs::create_dir_all(db_parent)
+            .await
+            .map_err(|e| AppError::Config(format!("cannot create db dir: {e}")))?;
+    }
+
+    tracing::info!(
+        data_dir = %config.data_dir.display(),
+        db_path = %config.db_path.display(),
+        "startup self-check passed"
+    );
+    Ok(())
+}
+
 /// Run the server until a shutdown signal is received.
 pub async fn run(config: Config) -> AppResult<()> {
     let bind_addr = config.bind_addr;
+    startup_self_check(&config).await?;
     let state = build_state(config).await?;
     let app = routes::router(state).into_make_service_with_connect_info::<SocketAddr>();
 

@@ -13,6 +13,7 @@ use crate::api::NestClient;
 use crate::config::AppConfig;
 use crate::error::{BirdError, BirdResult};
 use crate::state::AppState;
+use crate::sync::{GameSyncStatus, SyncResult, WatchedGame};
 
 /// Serializable error returned to the frontend.
 #[derive(Debug, Clone, Serialize)]
@@ -217,4 +218,67 @@ pub async fn discover_game(
     game_id: String,
 ) -> CommandResult<DiscoveredGame> {
     wrap(state.forager().discover_one(&game_id))
+}
+
+// ---------------------------------------------------------------------------
+// Flight Home (Phase 9)
+// ---------------------------------------------------------------------------
+
+/// Start watching a game for launch/exit events. `process_names` is optional;
+/// when empty the forager's known names are used.
+#[tauri::command]
+pub async fn watch_game(
+    state: State<'_, AppState>,
+    game_id: String,
+    process_names: Vec<String>,
+) -> CommandResult<Vec<String>> {
+    let names = if process_names.is_empty() {
+        wrap(state.forager().process_names(&game_id))?
+    } else {
+        process_names
+    };
+    wrap(state.flight().watch_game(game_id, names).await)
+}
+
+#[tauri::command]
+pub async fn unwatch_game(state: State<'_, AppState>, game_id: String) -> CommandResult<()> {
+    state.flight().unwatch_game(&game_id).await;
+    Ok(())
+}
+
+#[tauri::command]
+pub async fn watched_games(state: State<'_, AppState>) -> CommandResult<Vec<WatchedGame>> {
+    Ok(state.flight().watched_games().await)
+}
+
+#[tauri::command]
+pub async fn sync_status(
+    state: State<'_, AppState>,
+    game_id: String,
+) -> CommandResult<GameSyncStatus> {
+    Ok(state.flight().status(&game_id).await)
+}
+
+#[tauri::command]
+pub async fn sync_now(state: State<'_, AppState>, game_id: String) -> CommandResult<SyncResult> {
+    wrap(state.flight().sync_now(&game_id).await)
+}
+
+/// Resolve a Chilly Egg conflict and apply the chosen save.
+#[tauri::command]
+pub async fn resolve_and_sync(
+    state: State<'_, AppState>,
+    game_id: String,
+    resolution: String,
+) -> CommandResult<SyncResult> {
+    let resolution = match resolution.as_str() {
+        "nest" => Resolution::Nest,
+        "local" => Resolution::Local,
+        _ => {
+            return Err(
+                BirdError::Validation("resolution must be 'nest' or 'local'".to_string()).into(),
+            )
+        }
+    };
+    wrap(state.flight().resolve_and_sync(&game_id, resolution).await)
 }

@@ -32,6 +32,9 @@ pub struct VerifiedGame {
     /// placeholders such as `<home>`, `<winAppData>`, `<winLocalAppData>`,
     /// `<winDocuments>`, `<winPublic>`, and `<root>` (game install root).
     pub save_paths: HashMap<Platform, Vec<String>>,
+    /// Process names used by the Feather Agent to detect when this game is
+    /// running. The first matching executable wins.
+    pub process_names: Vec<String>,
 }
 
 impl VerifiedGame {
@@ -40,6 +43,7 @@ impl VerifiedGame {
             game_id: game_id.to_string(),
             title: title.to_string(),
             save_paths: HashMap::new(),
+            process_names: Vec::new(),
         }
     }
 
@@ -48,6 +52,11 @@ impl VerifiedGame {
             .entry(platform)
             .or_default()
             .push(template.to_string());
+        self
+    }
+
+    fn with_process_names(mut self, names: &[&str]) -> Self {
+        self.process_names = names.iter().map(|s| s.to_string()).collect();
         self
     }
 }
@@ -129,6 +138,16 @@ impl ForagingEngine {
             .find(|g| g.game_id == game_id)
             .ok_or_else(|| BirdError::GameNotFound(game_id.to_string()))?;
         self.discover_game(game)
+    }
+
+    /// Return the process names associated with a verified game.
+    pub fn process_names(&self, game_id: &str) -> BirdResult<Vec<String>> {
+        let game = self
+            .verified
+            .iter()
+            .find(|g| g.game_id == game_id)
+            .ok_or_else(|| BirdError::GameNotFound(game_id.to_string()))?;
+        Ok(game.process_names.clone())
     }
 
     fn discover_game(&self, game: &VerifiedGame) -> BirdResult<DiscoveredGame> {
@@ -289,7 +308,8 @@ fn built_in_verified_games() -> Vec<VerifiedGame> {
         VerifiedGame::new("stardew-valley", "Stardew Valley")
             .with_path(Platform::Windows, "<winAppData>/StardewValley/Saves")
             .with_path(Platform::Linux, "<home>/.config/StardewValley/Saves")
-            .with_path(Platform::MacOs, "<home>/.config/StardewValley/Saves"),
+            .with_path(Platform::MacOs, "<home>/.config/StardewValley/Saves")
+            .with_process_names(&["Stardew Valley.exe"]),
         VerifiedGame::new("hollow-knight", "Hollow Knight")
             .with_path(
                 Platform::Windows,
@@ -298,23 +318,27 @@ fn built_in_verified_games() -> Vec<VerifiedGame> {
             .with_path(
                 Platform::Linux,
                 "<home>/.config/unity3d/Team Cherry/Hollow Knight",
-            ),
+            )
+            .with_process_names(&["Hollow Knight.exe", "hollow_knight.exe"]),
         VerifiedGame::new("celeste", "Celeste")
             .with_path(Platform::Windows, "<winAppData>/Celeste")
             .with_path(Platform::Linux, "<home>/.local/share/Celeste")
             .with_path(
                 Platform::MacOs,
                 "<home>/Library/Application Support/Celeste",
-            ),
+            )
+            .with_process_names(&["Celeste.exe"]),
         VerifiedGame::new("hades", "Hades")
             .with_path(Platform::Windows, "<winDocuments>/Saved Games/Hades")
             .with_path(
                 Platform::Linux,
                 "<home>/.local/share/Supergiant Games/Hades",
-            ),
+            )
+            .with_process_names(&["Hades.exe"]),
         VerifiedGame::new("terraria", "Terraria")
             .with_path(Platform::Windows, "<winDocuments>/My Games/Terraria")
-            .with_path(Platform::Linux, "<home>/.local/share/Terraria"),
+            .with_path(Platform::Linux, "<home>/.local/share/Terraria")
+            .with_process_names(&["Terraria.exe"]),
     ]
 }
 

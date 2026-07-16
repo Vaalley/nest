@@ -22,8 +22,11 @@ nest-shared = { path = "../../shared" }
 
 tauri = { version = "2.0", features = ["tray-icon"] }
 
-tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs"] }
+tokio = { version = "1", features = ["rt-multi-thread", "macros", "fs", "time", "sync"] }
 reqwest = { version = "0.12", features = ["json", "multipart"] }
+
+sysinfo = "0.30"
+zip = { version = "2.2", default-features = false, features = ["deflate"] }
 
 serde = { workspace = true }
 serde_json = { workspace = true }
